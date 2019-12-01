@@ -2,7 +2,7 @@
 
 require 'pathname'
 
-def read_data
+def read_module_masses
   (Pathname(__dir__).parent / 'data' / 'day_01.txt').readlines.map(&:to_i)
 end
 
@@ -10,8 +10,8 @@ def calculate_module_fuel(mass)
   (mass / 3).truncate - 2
 end
 
-def part_one(data)
-  (data.map { |m| calculate_module_fuel(m) }).sum
+def part_one(masses)
+  (masses.map { |m| calculate_module_fuel(m) }).sum
 end
 
 def calculate_total_module_fuel(mass)
@@ -23,12 +23,12 @@ def calculate_total_module_fuel(mass)
   fuels.sum
 end
 
-def part_two(data)
-  (data.map { |m| calculate_total_module_fuel(m) }).sum
+def part_two(masses)
+  (masses.map { |m| calculate_total_module_fuel(m) }).sum
 end
 
 if $PROGRAM_NAME == __FILE__
-  data = read_data
-  puts "Part One: #{part_one(data)}"
-  puts "Part Two: #{part_two(data)}"
+  masses = read_module_masses
+  puts "Part One: #{part_one(masses)}"
+  puts "Part Two: #{part_two(masses)}"
 end
