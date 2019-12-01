@@ -29,6 +29,6 @@ end
 
 if $PROGRAM_NAME == __FILE__
   data = read_data
-  puts part_one(data)
-  puts part_two(data)
+  puts "Part One: #{part_one(data)}"
+  puts "Part Two: #{part_two(data)}"
 end
