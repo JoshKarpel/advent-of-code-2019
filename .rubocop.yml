@@ -1,2 +1,20 @@
 Metrics/LineLength:
   Max: 100
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/CaseIndentation:
+  IndentOneStep: true
+
+Layout/LeadingCommentSpace:
+  Enabled: false

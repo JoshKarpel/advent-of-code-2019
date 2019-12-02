@@ -1,6 +1,19 @@
 # frozen_string_literal: true
 
-PARAMETER_COUNTS = {1 => 3, 2 => 3, 99 => 0}.freeze
+OPERATIONS = {
+  1 => [
+    3,
+    proc do |codes, parameters|
+      codes[parameters[2]] = codes[parameters[0]] + codes[parameters[1]]
+    end,
+  ],
+  2 => [
+    3,
+    proc do |codes, parameters|
+      codes[parameters[2]] = codes[parameters[0]] * codes[parameters[1]]
+    end,
+  ],
+}.freeze
 
 def execute(codes)
   codes = codes.dup
@@ -9,23 +22,19 @@ def execute(codes)
   loop do
     instruction = codes[instruction_pointer]
 
-    num_parameters = PARAMETER_COUNTS[instruction]
-    if num_parameters.nil?
+    # not sure how to not special-case this...
+    return codes if instruction == 99
+
+    unless OPERATIONS.key? instruction
       raise ArgumentError, "Unrecognized opcode #{instruction} at address #{instruction_pointer}"
     end
 
-    parameters = codes[instruction_pointer + 1, num_parameters]
+    num_parameters, operation = OPERATIONS[instruction]
 
     #puts "#{instruction} #{parameters} #{codes}"
 
-    case instruction
-    when 1
-      codes[parameters[2]] = codes[parameters[0]] + codes[parameters[1]]
-    when 2
-      codes[parameters[2]] = codes[parameters[0]] * codes[parameters[1]]
-    when 99
-      return codes
-    end
+    parameters = codes[instruction_pointer + 1, num_parameters]
+    operation.call(codes, parameters)
 
     instruction_pointer += num_parameters + 1
   end
