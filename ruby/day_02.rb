@@ -8,17 +8,16 @@ end
 
 def execute(codes)
   executing = codes.dup
-  (0..executing.size).step(4) do |opcode_position|
-    case executing[opcode_position]
+  (0..executing.size).step(4) do |opcode_address|
+    case executing[opcode_address]
     when 1
-      executing[executing[opcode_position + 3]] = executing[executing[opcode_position + 1]] + executing[executing[opcode_position + 2]]
+      executing[executing[opcode_address + 3]] = executing[executing[opcode_address + 1]] + executing[executing[opcode_address + 2]]
     when 2
-      executing[executing[opcode_position + 3]] = executing[executing[opcode_position + 1]] * executing[executing[opcode_position + 2]]
+      executing[executing[opcode_address + 3]] = executing[executing[opcode_address + 1]] * executing[executing[opcode_address + 2]]
     when 99
       break
     end
   end
-  puts executing.to_s
   executing
 end
 
@@ -29,12 +28,25 @@ def part_one(codes)
   executed[0]
 end
 
-def part_two(codes)
-  ;
+def find_valid_program(codes, target)
+  (0..99).each do |noun|
+    (0..99).each do |verb|
+      code = codes.dup
+      code[1] = noun
+      code[2] = verb
+      executed = execute(code)
+      return [noun, verb] if executed[0] == target
+    end
+  end
+end
+
+def part_two(codes, target)
+  noun, verb = find_valid_program(codes, target)
+  (100 * noun) + verb
 end
 
 if $PROGRAM_NAME == __FILE__
   codes = read_codes
   puts "Part One: #{part_one(codes)}"
-  puts "Part Two: #{part_two(codes)}"
+  puts "Part Two: #{part_two(codes, 19_690_720)}"
 end
