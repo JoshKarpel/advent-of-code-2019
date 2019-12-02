@@ -2,11 +2,11 @@
 
 OPERATIONS = {
   1 =>
-    proc do |codes, a, b, target|
+    lambda do |codes, a, b, target|
       codes[target] = codes[a] + codes[b]
     end,
   2 =>
-    proc do |codes, a, b, target|
+    lambda do |codes, a, b, target|
       codes[target] = codes[a] * codes[b]
     end,
 }.freeze
