@@ -1,24 +1,10 @@
 # frozen_string_literal: true
 
 require 'pathname'
+require './intcode'
 
 def read_codes
   (Pathname(__dir__).parent / 'data' / 'day_02.txt').read.split(',').map(&:to_i)
-end
-
-def execute(codes)
-  executing = codes.dup
-  (0..executing.size).step(4) do |opcode_address|
-    case executing[opcode_address]
-    when 1
-      executing[executing[opcode_address + 3]] = executing[executing[opcode_address + 1]] + executing[executing[opcode_address + 2]]
-    when 2
-      executing[executing[opcode_address + 3]] = executing[executing[opcode_address + 1]] * executing[executing[opcode_address + 2]]
-    when 99
-      break
-    end
-  end
-  executing
 end
 
 def part_one(codes)
