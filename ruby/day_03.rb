@@ -43,8 +43,12 @@ def part_one(paths)
   (intersections(paths).map { |intersection| manhattan(intersection) }).min
 end
 
+def delay(path, position)
+  path.index(position)
+end
+
 def part_two(paths)
-  (intersections(paths).map { |intersection| (paths.map { |path| path.index(intersection) }).sum }).min
+  (intersections(paths).map { |intersection| (paths.map { |path| delay(path, intersection) }).sum }).min
 end
 
 if $PROGRAM_NAME == __FILE__
