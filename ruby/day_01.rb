@@ -20,9 +20,7 @@ def calculate_total_module_fuel(mass)
   fuel = extra_fuel
 
   # extra fuel for the extra fuel
-  while (extra_fuel = calculate_module_fuel(extra_fuel)).positive?
-    fuel += extra_fuel
-  end
+  fuel += extra_fuel while (extra_fuel = calculate_module_fuel(extra_fuel)).positive?
 
   fuel
 end
