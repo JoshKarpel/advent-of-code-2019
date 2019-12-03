@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require 'pathname'
-require './intcode'
+
+require_relative 'intcode'
 
 def read_codes
   (Pathname(__dir__).parent / 'data' / 'day_02.txt').read.split(',').map(&:to_i)
@@ -17,10 +18,10 @@ end
 def find_valid_program(codes, target)
   (0..99).each do |noun|
     (0..99).each do |verb|
-      code = codes.dup
-      code[1] = noun
-      code[2] = verb
-      executed = execute(code)
+      test = codes.dup
+      test[1] = noun
+      test[2] = verb
+      executed = execute(test)
       return [noun, verb] if executed[0] == target
     end
   end

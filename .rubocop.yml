@@ -18,3 +18,6 @@ Layout/CaseIndentation:
 
 Layout/LeadingCommentSpace:
   Enabled: false
+
+Layout/EndOfLine:
+  Enabled: false

@@ -4,4 +4,4 @@ set -e
 
 echo "Running: day_$1.rb"
 echo "----------------------------"
-ruby ruby/day_$1.rb
+ruby ruby/day_"$1".rb
