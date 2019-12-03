@@ -33,6 +33,8 @@ def part_two(program, target)
 end
 
 if $PROGRAM_NAME == __FILE__
+  puts 'https://adventofcode.com/2019/day/2'
+
   program = read_program
   puts "Part One: #{part_one(program)}"
   puts "Part Two: #{part_two(program, 19_690_720)}"

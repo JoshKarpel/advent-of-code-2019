@@ -2,16 +2,12 @@
 
 require 'pathname'
 
-require_relative 'intcode'
+require_relative 'utils'
 
 def read_wire_instructions
   (Pathname(__dir__).parent / 'data' / 'day_03.txt').readlines.map do |line|
     line.split(',').map { |instruction| [instruction[0].to_sym, instruction[1..-1].to_i] }
   end
-end
-
-def manhattan_distance(p, q)
-  p.zip(q).reduce(0) { |acc, (r, s)| acc + (r - s).abs }
 end
 
 DIRECTION_TO_IDX_AND_SIGN = {
@@ -21,11 +17,10 @@ DIRECTION_TO_IDX_AND_SIGN = {
   L: [0, -1],
 }.freeze
 
-def calculate_trajectory_and_delays(instructions)
-  delay = 0
-  delays = {}
+def path(instructions)
+  path = []
   position = [0, 0]
-  trajectory = [position.dup]
+  delay = 0
 
   instructions.each do |direction, distance|
     idx, sign = DIRECTION_TO_IDX_AND_SIGN[direction]
@@ -33,30 +28,29 @@ def calculate_trajectory_and_delays(instructions)
       position[idx] += sign
       delay += 1
 
-      p = position.dup
-      trajectory << p
-      delays[p] ||= delay
+      path << position.dup
     end
   end
 
-  [trajectory, delays]
+  path
 end
 
-def part_one(intersections)
-  (intersections.map { |intersection| manhattan_distance(intersection, [0, 0]) }).min
+def intersections(paths)
+  (paths.reduce { |acc, path| acc & path }) - [[0, 0]]
 end
 
-def part_two(intersections, delays)
-  (intersections.map { |intersection| (delays.map { |d| d[intersection] }).sum }).min
+def part_one(paths)
+  (intersections(paths).map { |intersection| manhattan(intersection) }).min
+end
+
+def part_two(paths)
+  (intersections(paths).map { |intersection| (paths.map { |path| path.index(intersection) }).sum }).min
 end
 
 if $PROGRAM_NAME == __FILE__
-  wire_1_instructions, wire_2_instructions = read_wire_instructions
-  wire_1_trajectory, wire_1_delays = calculate_trajectory_and_delays wire_1_instructions
-  wire_2_trajectory, wire_2_delays = calculate_trajectory_and_delays wire_2_instructions
+  puts 'https://adventofcode.com/2019/day/3'
 
-  intersections = (wire_1_trajectory & wire_2_trajectory) - [[0, 0]]
-
-  puts "Part One: #{part_one(intersections)}"
-  puts "Part Two: #{part_two(intersections, [wire_1_delays, wire_2_delays])}"
+  paths = read_wire_instructions.map { |x| path(x) }
+  puts "Part One: #{part_one(paths)}"
+  puts "Part Two: #{part_two(paths)}"
 end
