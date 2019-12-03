@@ -15,12 +15,16 @@ def part_one(masses)
 end
 
 def calculate_total_module_fuel(mass)
-  fuels = [calculate_module_fuel(mass)]
-  loop do
-    extra_fuel = calculate_module_fuel(fuels[-1])
-    extra_fuel.positive? ? fuels << extra_fuel : break
+  # this is the module itself
+  extra_fuel = calculate_module_fuel(mass)
+  fuel = extra_fuel
+
+  # extra fuel for the extra fuel
+  while (extra_fuel = calculate_module_fuel(extra_fuel)).positive?
+    fuel += extra_fuel
   end
-  fuels.sum
+
+  fuel
 end
 
 def part_two(masses)
