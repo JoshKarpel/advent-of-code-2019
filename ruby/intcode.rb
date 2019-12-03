@@ -2,24 +2,24 @@
 
 OPERATIONS = {
   1 =>
-    lambda do |codes, a, b, target|
-      codes[target] = codes[a] + codes[b]
+    lambda do |program, a, b, target|
+      program[target] = program[a] + program[b]
     end,
   2 =>
-    lambda do |codes, a, b, target|
-      codes[target] = codes[a] * codes[b]
+    lambda do |program, a, b, target|
+      program[target] = program[a] * program[b]
     end,
 }.freeze
 
-def execute(codes)
-  codes = codes.dup
+def execute(program)
+  program = program.dup
 
   instruction_pointer = 0
   loop do
-    opcode = codes[instruction_pointer]
+    opcode = program[instruction_pointer]
 
     # not sure how to not special-case this...
-    return codes if opcode == 99
+    return program if opcode == 99
 
     operation = OPERATIONS[opcode]
     if operation.nil?
@@ -27,9 +27,9 @@ def execute(codes)
     end
 
     num_parameters = operation.arity - 1
-    parameters = codes[instruction_pointer + 1, num_parameters]
+    parameters = program[instruction_pointer + 1, num_parameters]
 
-    operation.call(codes, *parameters)
+    operation.call(program, *parameters)
 
     instruction_pointer += num_parameters + 1
   end

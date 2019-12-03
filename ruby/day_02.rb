@@ -4,21 +4,21 @@ require 'pathname'
 
 require_relative 'intcode'
 
-def read_codes
+def read_program
   (Pathname(__dir__).parent / 'data' / 'day_02.txt').read.split(',').map(&:to_i)
 end
 
-def part_one(codes)
-  codes[1] = 12
-  codes[2] = 2
-  executed = execute(codes)
+def part_one(program)
+  program[1] = 12
+  program[2] = 2
+  executed = execute(program)
   executed[0]
 end
 
-def find_valid_program(codes, target)
+def find_valid_program(program, target)
   (0..99).each do |noun|
     (0..99).each do |verb|
-      test = codes.dup
+      test = program.dup
       test[1] = noun
       test[2] = verb
       executed = execute(test)
@@ -27,13 +27,13 @@ def find_valid_program(codes, target)
   end
 end
 
-def part_two(codes, target)
-  noun, verb = find_valid_program(codes, target)
+def part_two(program, target)
+  noun, verb = find_valid_program(program, target)
   (100 * noun) + verb
 end
 
 if $PROGRAM_NAME == __FILE__
-  codes = read_codes
-  puts "Part One: #{part_one(codes)}"
-  puts "Part Two: #{part_two(codes, 19_690_720)}"
+  program = read_program
+  puts "Part One: #{part_one(program)}"
+  puts "Part Two: #{part_two(program, 19_690_720)}"
 end
