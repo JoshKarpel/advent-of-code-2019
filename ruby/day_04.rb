@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require 'pathname'
-
-require_relative 'utils'
-
-def read_
-  (Pathname(__dir__).parent / 'data' / 'day_04.txt')
+def monotonically_increasing(x)
+  (1...x.length).each do |i|
+    return false unless x[i] >= x[i - 1]
+  end
 end
 
 def two_adjacent_same(x)
@@ -15,20 +13,19 @@ def two_adjacent_same(x)
   false
 end
 
-def monotonically_increasing(x)
-  (1...x.length).each do |i|
-    return false unless x[i] >= x[i - 1]
-  end
+def part_one(range)
+  (range.select { |r| two_adjacent_same(r) && monotonically_increasing(r) }).length
 end
 
-def part_one(range)
-  valid = range.select do |r|
-    two_adjacent_same(r) && monotonically_increasing(r)
+def exactly_two_adjacent_same(x)
+  (0...x.length - 1).each do |i|
+    return true if x[i] == x[i + 1] && x[i - 1] != x[i] && x[i + 2] != x[i + 1]
   end
-  valid.length
+  false
 end
 
 def part_two(range)
+  (range.select { |r| exactly_two_adjacent_same(r) && monotonically_increasing(r) }).length
 end
 
 if $PROGRAM_NAME == __FILE__
