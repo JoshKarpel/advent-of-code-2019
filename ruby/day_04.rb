@@ -1,17 +1,11 @@
 # frozen_string_literal: true
 
 def monotonically_increasing(p)
-  (1...p.length).each do |i|
-    return false unless p[i] >= p[i - 1]
-  end
-  true
+  p.chars.each_cons(2).all? { |a, b| b.nil? || a <= b }
 end
 
 def two_adjacent_characters_match(p)
-  (0...p.length - 1).each do |i|
-    return true if p[i] == p[i + 1]
-  end
-  false
+  p.chars.each_cons(2).any? { |a, b| a == b }
 end
 
 def part_one(passwords)
