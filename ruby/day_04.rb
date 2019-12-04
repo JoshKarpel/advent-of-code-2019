@@ -15,6 +15,11 @@ def part_one(passwords)
 end
 
 def exactly_two_adjacent_characters_match(p)
+  # This only works in conjunction with the other condition!
+  # Otherwise, p[i - 1] != p[i] checks that the start and end of the string are the same when i = 0.
+  # But that can't be the case if you also only want two characters to match, because it would imply
+  # that the whole string is just that character.
+  # Thus, this hack!
   (0...p.length - 1).each do |i|
     return true if p[i] == p[i + 1] && p[i - 1] != p[i] && p[i + 2] != p[i + 1]
   end
