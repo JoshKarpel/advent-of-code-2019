@@ -5,13 +5,11 @@ require 'pathname'
 require_relative 'intcode'
 
 def part_one(program)
-  program, outputs = execute(program, [1])
-  outputs.last
+  Intcode.new(program, [1]).execute.outputs.last
 end
 
 def part_two(program)
-  program, outputs = execute(program, [5])
-  outputs.last
+  Intcode.new(program, [5]).execute.outputs.last
 end
 
 if $PROGRAM_NAME == __FILE__
