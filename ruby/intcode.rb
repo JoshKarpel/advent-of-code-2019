@@ -10,6 +10,7 @@ OPERATIONS = {
       program[target] = program[a] * program[b]
     end,
 }.freeze
+# opcode 99 is special-cased during execute
 
 def execute(program)
   program = program.dup
@@ -18,19 +19,17 @@ def execute(program)
   loop do
     opcode = program[instruction_pointer]
 
-    # not sure how to not special-case this...
-    return program if opcode == 99
+    return program[0] if opcode == 99
 
     operation = OPERATIONS[opcode]
-    if operation.nil?
-      raise ArgumentError, "Unrecognized opcode #{opcode} at address #{instruction_pointer}"
-    end
+    raise ArgumentError, "Unrecognized opcode #{opcode} at address #{instruction_pointer}" if operation.nil?
 
-    num_parameters = operation.arity - 1
-    parameters = program[instruction_pointer + 1, num_parameters]
+    operation.call(program, *program[instruction_pointer + 1, operation.arity - 1])
 
-    operation.call(program, *parameters)
-
-    instruction_pointer += num_parameters + 1
+    instruction_pointer += operation.arity
   end
+end
+
+def read_program(path)
+  path.read.split(',').map(&:to_i)
 end
