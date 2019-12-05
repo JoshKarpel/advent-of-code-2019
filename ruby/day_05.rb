@@ -2,15 +2,15 @@
 
 require 'pathname'
 
-require_relative 'intcode2'
+require_relative 'intcode'
 
 def part_one(program)
-  program, inputs, outputs = execute(program, [1])
+  program, outputs = execute(program, [1])
   outputs.last
 end
 
 def part_two(program)
-  program, inputs, outputs = execute(program, [5])
+  program, outputs = execute(program, [5])
   outputs.last
 end
 
