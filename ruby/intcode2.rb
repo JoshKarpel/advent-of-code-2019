@@ -4,19 +4,37 @@ OPERATIONS = {
   1 =>
     lambda do |program, _inputs, _outputs, a, b, target|
       program[target] = a + b
+      nil
     end,
   2 =>
     lambda do |program, _inputs, _outputs, a, b, target|
       program[target] = a * b
+      nil
     end,
   3 =>
     lambda do |program, inputs, _outputs, target|
       program[target] = inputs.shift
+      nil
     end,
   4 =>
     lambda do |_program, _inputs, outputs, target|
       outputs << target
+      nil
     end,
+  5 => lambda do |_program, _inputs, _outputs, test, pointer|
+    !test.zero? ? pointer : nil
+  end,
+  6 => lambda do |_program, _inputs, _outputs, test, pointer|
+    test.zero? ? pointer : nil
+  end,
+  7 => lambda do |program, _inputs, _outputs, left, right, target|
+    program[target] = left < right ? 1 : 0
+    nil
+  end,
+  8 => lambda do |program, _inputs, _outputs, left, right, target|
+    program[target] = left == right ? 1 : 0
+    nil
+  end,
 }.freeze
 # opcode 99 is special-cased during execute
 
@@ -25,6 +43,10 @@ WRITES = {
   2 => [2],
   3 => [0],
   4 => [],
+  5 => [],
+  6 => [],
+  7 => [2],
+  8 => [2],
 }.freeze
 
 def execute(program, inputs = nil)
@@ -63,10 +85,10 @@ def execute(program, inputs = nil)
       end
     end
 
-    #puts "#{instruction_pointer} op#{opcode} i#{inputs} o#{outputs} m#{modes} r#{raw_parameters} p#{parameters} #{program}"
-    operation.call(program, inputs, outputs, *parameters)
+    puts "#{instruction_pointer} op#{opcode} i#{inputs} o#{outputs} m#{modes} r#{raw_parameters} p#{parameters} #{program}"
+    move = operation.call(program, inputs, outputs, *parameters)
 
-    instruction_pointer += num_parameters + 1
+    move.nil? ? instruction_pointer += num_parameters + 1 : instruction_pointer = move
   end
 end
 

@@ -10,6 +10,8 @@ def part_one(program)
 end
 
 def part_two(program)
+  program, inputs, outputs = execute(program, [5])
+  outputs.last
 end
 
 if $PROGRAM_NAME == __FILE__
