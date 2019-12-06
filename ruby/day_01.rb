@@ -33,6 +33,7 @@ if $PROGRAM_NAME == __FILE__
   puts 'https://adventofcode.com/2019/day/2'
 
   masses = read_module_masses
+
   puts "Part One: #{part_one(masses)}"
   puts "Part Two: #{part_two(masses)}"
 end

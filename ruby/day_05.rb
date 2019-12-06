@@ -16,6 +16,7 @@ if $PROGRAM_NAME == __FILE__
   puts 'https://adventofcode.com/2019/day/5'
 
   program = read_program Pathname(__dir__).parent / 'data' / 'day_05.txt'
+
   puts "Part One: #{part_one(program)}"
   puts "Part Two: #{part_two(program)}"
 end

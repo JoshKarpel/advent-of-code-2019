@@ -35,6 +35,7 @@ if $PROGRAM_NAME == __FILE__
   puts 'https://adventofcode.com/2019/day/4'
 
   passwords = '134792'..'675810'
+
   puts "Part One: #{part_one(passwords)}"
   puts "Part Two: #{part_two(passwords)}"
 end

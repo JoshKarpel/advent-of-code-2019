@@ -55,6 +55,7 @@ if $PROGRAM_NAME == __FILE__
   puts 'https://adventofcode.com/2019/day/3'
 
   paths = read_wire_instructions.map { |x| path(x) }
+
   puts "Part One: #{part_one(paths)}"
   puts "Part Two: #{part_two(paths)}"
 end
