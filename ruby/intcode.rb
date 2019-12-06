@@ -1,16 +1,5 @@
 # frozen_string_literal: true
 
-WRITES = {
-  1 => [2],
-  2 => [2],
-  3 => [0],
-  4 => [],
-  5 => [],
-  6 => [],
-  7 => [2],
-  8 => [2],
-}.freeze
-
 def read_program(path)
   path.read.split(',').map(&:to_i)
 end
@@ -42,7 +31,7 @@ class Intcode
         raise ArgumentError, "Unrecognized opcode #{opcode} at address #{instruction_pointer}"
       end
 
-      move = operation.call(*parameters(opcode, operation.arity, modes))
+      move = operation.call(*parameters(operation, modes))
 
       move.nil? ? @instruction_pointer += operation.arity + 1 : @instruction_pointer = move
     end
@@ -83,13 +72,15 @@ class Intcode
     @program[@instruction_pointer + 1, num_parameters]
   end
 
-  def parameters(opcode, num_parameters, modes)
-    raw_parameters(num_parameters)
-      .zip(modes)
-      .each.with_index.map do |(raw_param, mode), param_idx|
+  def parameters(operation, modes)
+    raw_parameters(operation.arity)
+      .zip(modes, operation.parameters.map(&:last).map(&:to_s))
+      .map do |raw_param, mode, param_name|
+      next raw_param if param_name.start_with?('w_')
+
       case mode
         when 0, nil
-          WRITES[opcode].include?(param_idx) ? raw_param : @program[raw_param]
+          @program[raw_param]
         when 1
           raw_param
         else
@@ -101,26 +92,26 @@ class Intcode
   # OPERATIONS
 
   # add
-  def do_1(a, b, target)
-    @program[target] = a + b
+  def do_1(a, b, w_target)
+    @program[w_target] = a + b
     nil
   end
 
   # multiply
-  def do_2(a, b, target)
-    @program[target] = a * b
+  def do_2(a, b, w_target)
+    @program[w_target] = a * b
     nil
   end
 
   # input
-  def do_3(target)
-    @program[target] = @inputs.shift
+  def do_3(w_target)
+    @program[w_target] = @inputs.shift
     nil
   end
 
   # output
-  def do_4(target)
-    @outputs << target
+  def do_4(output)
+    @outputs << output
     nil
   end
 
@@ -135,14 +126,14 @@ class Intcode
   end
 
   # less-than
-  def do_7(left, right, target)
-    @program[target] = left < right ? 1 : 0
+  def do_7(left, right, w_target)
+    @program[w_target] = left < right ? 1 : 0
     nil
   end
 
   # equals
-  def do_8(left, right, target)
-    @program[target] = left == right ? 1 : 0
+  def do_8(left, right, w_target)
+    @program[w_target] = left == right ? 1 : 0
     nil
   end
 
