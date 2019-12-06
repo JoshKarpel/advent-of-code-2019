@@ -28,13 +28,13 @@ def part_one(orbits)
 end
 
 def part_two(orbits)
-  up_from_you = path_to_com(orbits, 'YOU')
-  up_from_san = path_to_com(orbits, 'SAN')
+  up_from_you = Set.new(path_to_com(orbits, 'YOU'))
+  up_from_san = Set.new(path_to_com(orbits, 'SAN'))
 
-  you_idx = up_from_you.find_index { |x| up_from_san.include? x }
-  san_idx = up_from_san.find_index(up_from_you[you_idx])
+  # all of the elements from both sets that are not in the other
+  unordered_path = up_from_you ^ up_from_san
 
-  you_idx + san_idx - 2 # -2 because we want to count the edges, not the nodes
+  unordered_path.length - 2 # -2 because we want to count the edges, not the nodes
 end
 
 if $PROGRAM_NAME == __FILE__
