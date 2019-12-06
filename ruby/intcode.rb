@@ -26,23 +26,25 @@ class Intcode
 
       return self if opcode == 99
 
-      operation = method("do_#{opcode}".to_sym)
-      if operation.nil?
-        raise ArgumentError, "Unrecognized opcode #{opcode} at address #{instruction_pointer}"
-      end
+      op = operation opcode
+      move = op.call(*parameters(op, modes))
 
-      move = operation.call(*parameters(operation, modes))
-
-      move.nil? ? @instruction_pointer += operation.arity + 1 : @instruction_pointer = move
+      move.nil? ? @instruction_pointer += op.arity + 1 : @instruction_pointer = move
     end
+  end
+
+  def operation(opcode)
+    op = method("do_#{opcode}".to_sym)
+    if op.nil?
+      raise ArgumentError, "Unrecognized opcode #{opcode} at address #{@instruction_pointer}"
+    end
+
+    op
   end
 
   def state
     opcode, modes = opcode_and_modes
-    operation = method("do_#{opcode}".to_sym)
-    if operation.nil?
-      raise ArgumentError, "Unrecognized opcode #{opcode} at address #{@instruction_pointer}"
-    end
+    op = operation opcode
 
     [
       "in#{@instruction_pointer}",
@@ -50,8 +52,8 @@ class Intcode
       "i#{@inputs}",
       "o#{@outputs}",
       "m#{modes}",
-      "r#{raw_parameters(operation.arity)}",
-      "p#{parameters(opcode, operation.arity, modes)}",
+      "r#{raw_parameters(op)}",
+      "p#{parameters(op, modes)}",
       "prog#{@program}",
     ].join(' ')
   end
@@ -68,12 +70,12 @@ class Intcode
     [opcode, modes]
   end
 
-  def raw_parameters(num_parameters)
-    @program[@instruction_pointer + 1, num_parameters]
+  def raw_parameters(op)
+    @program[@instruction_pointer + 1, op.arity]
   end
 
   def parameters(operation, modes)
-    raw_parameters(operation.arity)
+    raw_parameters(operation)
       .zip(modes, operation.parameters.map(&:last).map(&:to_s))
       .map do |raw_param, mode, param_name|
       next raw_param if param_name.start_with?('w_')
@@ -137,7 +139,7 @@ class Intcode
     nil
   end
 
-  # break (dummy method, actually implemented in execute)
+  # break (dummy method, actually implemented in #execute, just here for #state)
   def do_99
   end
 end
