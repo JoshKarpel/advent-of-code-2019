@@ -16,6 +16,18 @@ def part_one(program)
 end
 
 def part_two(program)
+  outputs = (5..9).to_a.permutation.map do |phases|
+    input = 0
+    programs = phases.map { |phase| Intcode.new(program, [phase]) }
+    programs.each.cycle do |prog|
+      prog.inputs << input
+      prog.execute(:stop_on_output)
+      input = prog.outputs.last
+      break if (prog == programs.last) && prog.halted
+    end
+    input # the last input goes to the thrusters
+  end
+  outputs.max
 end
 
 if $PROGRAM_NAME == __FILE__

@@ -5,7 +5,7 @@ def read_program(path)
 end
 
 class Intcode
-  attr_reader :program, :inputs, :outputs
+  attr_reader :program, :inputs, :outputs, :halted
 
   def initialize(program, inputs = nil)
     @program = program.dup
@@ -13,23 +13,26 @@ class Intcode
 
     @outputs = []
     @instruction_pointer = 0
+
+    @halted = false
   end
 
-  def self.read(path, inputs = nil)
-    Intcode(path.read.split(',').map(&:to_i), inputs)
-  end
-
-  def execute
+  def execute(stop_on_output = false)
     loop do
-      #puts state
+      puts state
       opcode, modes = opcode_and_modes
 
-      return self if opcode == 99
+      if opcode == 99
+        @halted = true
+        return self
+      end
 
       op = operation opcode
       move = op.call(*parameters(op, modes))
 
       move.nil? ? @instruction_pointer += op.arity + 1 : @instruction_pointer = move
+
+      return self if stop_on_output == :stop_on_output && opcode == 4
     end
   end
 
