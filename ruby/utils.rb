@@ -15,6 +15,6 @@ end
 
 class Array
   def tally
-    self.each.tally
+    each.tally
   end
 end
