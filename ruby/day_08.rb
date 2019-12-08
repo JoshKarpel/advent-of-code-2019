@@ -21,6 +21,12 @@ def part_one(layers)
   fewest_0s[1] * fewest_0s[2]
 end
 
+PIXEL_TO_DISPLAY = {
+  2 => ' ',
+  1 => '█',
+  0 => '░',
+}.freeze
+
 def part_two(layers, width, height)
   image = Array.new(width * height, 2)
   layers.each do |layer|
@@ -29,22 +35,10 @@ def part_two(layers, width, height)
     end
   end
 
-  msg = []
-  height.times do |y|
-    width.times do |x|
-      pixel = image[x + (y * width)]
-      msg << case pixel
-        when 2
-          ' '
-        when 1
-          '█'
-        when 0
-          '░'
-      end
-    end
-    msg << "\n"
-  end
-  "\n" + msg.join
+  image.map! { |pixel| PIXEL_TO_DISPLAY[pixel] }
+
+  lines = image.each_slice(width).map(&:join)
+  "\n" + lines.join("\n")
 end
 
 if $PROGRAM_NAME == __FILE__
