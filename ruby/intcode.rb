@@ -19,7 +19,7 @@ class Intcode
 
   def execute(stop_on_output = false)
     loop do
-      puts state
+      #puts state
       opcode, modes = opcode_and_modes
 
       if opcode == 99
@@ -32,7 +32,7 @@ class Intcode
 
       move.nil? ? @instruction_pointer += op.arity + 1 : @instruction_pointer = move
 
-      return self if stop_on_output == :stop_on_output && opcode == 4
+      return self if stop_on_output && opcode == 4
     end
   end
 

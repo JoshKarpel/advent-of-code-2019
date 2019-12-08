@@ -21,8 +21,7 @@ def part_two(program)
     programs = phases.map { |phase| Intcode.new(program, [phase]) }
     programs.each.cycle do |prog|
       prog.inputs << input
-      prog.execute(:stop_on_output)
-      input = prog.outputs.last
+      input = prog.execute(stop_on_output: true).outputs.last
       break if (prog == programs.last) && prog.halted
     end
     input # the last input goes to the thrusters
