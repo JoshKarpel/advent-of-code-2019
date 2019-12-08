@@ -16,6 +16,9 @@ Style/TrailingCommaInArrayLiteral:
 Style/EmptyMethod:
   Enabled: false
 
+Style/ParallelAssignment:
+  Enabled: false
+
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 
