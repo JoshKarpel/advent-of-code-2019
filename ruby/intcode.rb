@@ -8,11 +8,16 @@ class Intcode
   attr_reader :program, :inputs, :outputs, :halted
 
   def initialize(program, inputs = nil)
-    @program = program.dup
+    @program = Hash.new(0)
+    program.each.with_index do |int, idx|
+      @program[idx] = int
+    end
     @inputs = inputs || []
 
     @outputs = []
     @instruction_pointer = 0
+
+    @relative_base = 0
 
     @halted = false
   end
@@ -48,13 +53,13 @@ class Intcode
   def state
     opcode, modes = opcode_and_modes
     op = operation opcode
-
     [
       "in#{@instruction_pointer}",
       "op#{opcode}",
       "i#{@inputs}",
       "o#{@outputs}",
       "m#{modes}",
+      "b#{@relative_base}",
       "r#{raw_parameters(op)}",
       "p#{parameters(op, modes)}",
       "prog#{@program}",
@@ -74,20 +79,24 @@ class Intcode
   end
 
   def raw_parameters(op)
-    @program[@instruction_pointer + 1, op.arity]
+    params = []
+    op.arity.times do |idx|
+      params << @program[@instruction_pointer + 1 + idx] || 0
+    end
+    params
   end
 
   def parameters(operation, modes)
     raw_parameters(operation)
       .zip(modes, operation.parameters.map(&:last).map(&:to_s))
       .map do |raw_param, mode, param_name|
-      next raw_param if param_name.start_with?('w_')
-
       case mode
         when 0, nil
-          @program[raw_param]
+          param_name.start_with?('w_') ? raw_param : @program[raw_param]
         when 1
           raw_param
+        when 2
+          param_name.start_with?('w_') ? raw_param + @relative_base : @program[raw_param + @relative_base]
         else
           raise ArgumentError, "Unrecognized mode #{mode} for instruction #{@instruction_pointer}"
       end
@@ -139,6 +148,12 @@ class Intcode
   # equals
   def do_8(left, right, w_target)
     @program[w_target] = left == right ? 1 : 0
+    nil
+  end
+
+  # adjust relative base
+  def do_9(adjustment)
+    @relative_base += adjustment
     nil
   end
 
