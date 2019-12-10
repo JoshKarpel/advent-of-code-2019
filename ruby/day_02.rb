@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 # frozen_string_literal: true
 
 require 'pathname'
@@ -5,15 +7,17 @@ require 'pathname'
 require_relative 'intcode'
 
 def part_one(program)
-  program[1, 2] = [12, 2]
-  Intcode.new(program).execute.program.first
+  program[1] = 12
+  program[2] = 2
+  Intcode.new(program).execute.memory[0]
 end
 
 def part_two(program, target)
-  noun, verb = (0..99).to_a.permutation(2) do |noun_and_verb|
+  noun, verb = (0..99).to_a.permutation(2) do |noun, verb|
     test = program.dup
-    test[1, 2] = noun_and_verb
-    break noun_and_verb if Intcode.new(test).execute.program.first == target
+    program[1] = noun
+    program[2] = verb
+    break noun, verb if Intcode.new(test).execute.memory[0] == target
   end
   (100 * noun) + verb
 end

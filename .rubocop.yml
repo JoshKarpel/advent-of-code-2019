@@ -19,6 +19,12 @@ Style/EmptyMethod:
 Style/ParallelAssignment:
   Enabled: false
 
+Style/Documentation:
+  Enabled: False
+
+Style/DocumentationMethod:
+  Enabled: False
+
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 

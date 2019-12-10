@@ -11,13 +11,11 @@ module ParameterMode
 end
 
 class Intcode
-  attr_reader :program, :inputs, :outputs, :halted
+  attr_reader :memory, :inputs, :outputs, :halted
 
   def initialize(program, inputs = nil)
-    @program = Hash.new(0)
-    program.each.with_index do |int, idx|
-      @program[idx] = int
-    end
+    @memory = Hash.new(0)
+    program.each.with_index { |int, idx| @memory[idx] = int }
     @inputs = inputs || []
 
     @outputs = []
@@ -30,18 +28,12 @@ class Intcode
     loop do
       #puts state
       opcode, modes = opcode_and_modes
-
-      if opcode == 99
-        @halted = true
-        return self
-      end
-
       op = operation opcode
       move = op.call(*parameters(op, modes))
 
       move.nil? ? @instruction_pointer += op.arity + 1 : @instruction_pointer = move
 
-      return self if stop_on_output && opcode == 4
+      return self if @halted || (stop_on_output && opcode == 4)
     end
   end
 
@@ -54,10 +46,10 @@ class Intcode
       "i#{@inputs}",
       "o#{@outputs}",
       "m#{modes}",
-      "b#{@relative_base}",
+      "rb#{@relative_base}",
       "r#{raw_parameters(op)}",
       "p#{parameters(op, modes)}",
-      "prog#{@program}",
+      "prog#{@memory}",
     ].join(' ')
   end
 
@@ -73,7 +65,7 @@ class Intcode
     end
 
     def opcode_and_modes
-      instruction = @program[@instruction_pointer].to_s
+      instruction = @memory[@instruction_pointer].to_s
       if instruction.length <= 2
         opcode = instruction.to_i
         modes = []
@@ -93,11 +85,7 @@ class Intcode
     end
 
     def raw_parameters(op)
-      params = []
-      op.arity.times do |idx|
-        params << @program[@instruction_pointer + 1 + idx] || 0
-      end
-      params
+      op.arity.times.map { |idx| @memory[@instruction_pointer + 1 + idx] || 0 }
     end
 
     def parameter_value(mode, param_name, raw_param)
@@ -105,30 +93,30 @@ class Intcode
 
       raw_param += @relative_base if mode == ParameterMode::RELATIVE
 
-      # semantics of POSITION and IMMEDIATE are the same at this point
+      # semantics of POSITION and RELATIVE are the same at this point
 
       return raw_param if param_name.start_with?('w_')
 
-      @program[raw_param]
+      @memory[raw_param]
     end
 
     # OPERATIONS
 
     # add
     def do_1(a, b, w_target)
-      @program[w_target] = a + b
+      @memory[w_target] = a + b
       nil
     end
 
     # multiply
     def do_2(a, b, w_target)
-      @program[w_target] = a * b
+      @memory[w_target] = a * b
       nil
     end
 
     # input
     def do_3(w_target)
-      @program[w_target] = @inputs.shift
+      @memory[w_target] = @inputs.shift
       nil
     end
 
@@ -150,13 +138,13 @@ class Intcode
 
     # less-than
     def do_7(left, right, w_target)
-      @program[w_target] = left < right ? 1 : 0
+      @memory[w_target] = left < right ? 1 : 0
       nil
     end
 
     # equals
     def do_8(left, right, w_target)
-      @program[w_target] = left == right ? 1 : 0
+      @memory[w_target] = left == right ? 1 : 0
       nil
     end
 
@@ -166,7 +154,8 @@ class Intcode
       nil
     end
 
-    # break (dummy method, actually implemented in #execute, just here for #state)
+    # break
     def do_99
+      @halted = true
     end
 end
