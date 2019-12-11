@@ -24,9 +24,8 @@ def part_one(layers)
 end
 
 PIXEL_TO_DISPLAY = {
-  2 => ' ',
   1 => '█',
-  0 => '░',
+  0 => ' ',
 }.freeze
 
 def part_two(layers, width, height)

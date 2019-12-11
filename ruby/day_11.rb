@@ -7,7 +7,7 @@ require 'matrix'
 
 require_relative 'intcode'
 
-FACING = {
+TURN = {
   0 => -1i,
   1 => +1i,
 }.freeze
@@ -36,8 +36,8 @@ def paint_hull(program, starting_color)
     color, turn = brain.outputs.shift(2)
 
     hull[position] = color
-    facing *= FACING[turn]
-    position -= MOVE[facing] # TODO: inverted moves for some reason?
+    facing *= TURN[turn]
+    position += MOVE[facing] # TODO: inverted moves for some reason?
   end
 
   hull.map { |k, v| [k.to_a, v] }.to_h
@@ -48,7 +48,7 @@ def part_one(program)
 end
 
 CHAR = {
-  0 => '░',
+  0 => ' ',
   1 => '█',
 }.freeze
 
@@ -60,8 +60,8 @@ def part_two(program)
   max_y = hull.keys.map(&:last).max
 
   msg = []
-  (min_y..max_y).each do |y|
-    (min_x..max_x).each do |x|
+  (min_y..max_y).reverse_each do |y|
+    (min_x..max_x).reverse_each do |x|
       msg << CHAR[hull[[x, y]] || 0]
     end
     msg << "\n"
