@@ -56,12 +56,7 @@ class Intcode
   private
 
     def operation(opcode)
-      op = method("do_#{opcode}".to_sym)
-      if op.nil?
-        raise ArgumentError, "Unrecognized opcode #{opcode} at address #{@instruction_pointer}"
-      end
-
-      op
+      method("do_#{opcode}".to_sym)
     end
 
     def opcode_and_modes
