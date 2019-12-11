@@ -37,7 +37,7 @@ def paint_hull(program, starting_color)
 
     hull[position] = color
     facing *= TURN[turn]
-    position += MOVE[facing] # TODO: inverted moves for some reason?
+    position += MOVE[facing]
   end
 
   hull.map { |k, v| [k.to_a, v] }.to_h
@@ -59,6 +59,8 @@ def part_two(program)
   min_y = hull.keys.map(&:last).min
   max_y = hull.keys.map(&:last).max
 
+  # loop in reverse because it turns out the image drawn from the top left,
+  # so all the coordinates are negative
   msg = []
   (min_y..max_y).reverse_each do |y|
     (min_x..max_x).reverse_each do |x|
