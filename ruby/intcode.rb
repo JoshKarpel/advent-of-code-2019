@@ -152,5 +152,6 @@ class Intcode
     # break
     def do_99
       @halted = true
+      nil
     end
 end

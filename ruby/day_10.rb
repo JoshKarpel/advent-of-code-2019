@@ -69,16 +69,16 @@ end
 def part_two(asteroids)
   laser = find_best_location(asteroids)
 
-  asteroids_by_angle = visible_asteroids(asteroids, laser).map do |a, k|
-    [Math.atan2(*a), k]
-  end
-  asteroids_by_angle.sort_by!(&:first)
-  new_start = asteroids_by_angle.map(&:first).find_index { |angle| angle >= Math::PI / 2 }
-  roids = asteroids_by_angle.map(&:last).rotate(new_start)
+  asteroids_by_angle = visible_asteroids(asteroids, laser).map { |a, k| [Math.atan2(*a), k] }
+                                                          .sort_by(&:first)
+  up_index = asteroids_by_angle.map(&:first)
+                               .find_index { |angle| angle >= Math::PI / 2 }
+  roids = asteroids_by_angle.map(&:last)
+                            .rotate(up_index)
 
   destruction_order = []
   while roids.map(&:length).any?(&:positive?)
-    roids.filter { |r| !r.length.zero? }.each do |r|
+    roids.filter { |r| r.length.positive? }.each do |r|
       destruction_order << r.shift
     end
   end
