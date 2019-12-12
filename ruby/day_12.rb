@@ -35,12 +35,16 @@ class Moon
   def to_s
     "r=#{@position} v=#{@velocity}"
   end
+
+  def same_state(moon)
+    @position == moon.position && @velocity == moon.velocity
+  end
+
+  alias == same_state
 end
 
 def part_one(moon_positions)
-  moons = moon_positions.map do |x|
-    Moon.new(x)
-  end
+  moons = moon_positions.map { |x| Moon.new(x) }
 
   1000.times do
     moons.permutation(2) do |a, b|
@@ -54,6 +58,25 @@ def part_one(moon_positions)
 end
 
 def part_two(moon_positions)
+  moons = moon_positions.map { |x| Moon.new(x) }
+
+  cycle_lengths = 3.times.map do |k|
+    basis = Vector.basis(size: 3, index: k)
+    initial = moons.map { |moon| Moon.new(Vector.elements(moon.position.collect2(basis) { |m, b| m * b })) }
+    test = initial.map(&:dup)
+
+    1.step do |step|
+      test.permutation(2) do |a, b|
+        a.pulled_by b
+      end
+
+      test.each(&:move)
+
+      break step if test == initial
+    end
+  end
+
+  cycle_lengths.reduce(1, :lcm)
 end
 
 if $PROGRAM_NAME == __FILE__
