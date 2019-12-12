@@ -72,7 +72,7 @@ def part_two(program)
 end
 
 if $PROGRAM_NAME == __FILE__
-  puts 'https://adventofcode.com/2019/day/9'
+  puts 'https://adventofcode.com/2019/day/11'
 
   program = read_program Pathname(__dir__).parent / 'data' / 'day_11.txt'
 
