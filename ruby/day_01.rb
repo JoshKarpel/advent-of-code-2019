@@ -32,7 +32,7 @@ def part_two(masses)
 end
 
 if $PROGRAM_NAME == __FILE__
-  puts 'https://adventofcode.com/2019/day/2'
+  puts 'https://adventofcode.com/2019/day/1'
 
   masses = read_module_masses
 
