@@ -23,6 +23,11 @@ MOVE_CMDS = {
   EAST => 4,
 }.freeze
 
+CORRIDOR = ' '
+DROID = 'D'
+WALL = '#'
+UNKNOWN = '~'
+
 def draw(m)
   min_x = m.keys.map(&:first).min
   max_x = m.keys.map(&:first).max
@@ -45,14 +50,54 @@ def complex_to_coord(c)
   [c.real, c.imag]
 end
 
+def explore(program, callback)
+  droid = Intcode.new(program)
+  start = 0 + 0i
+  position = 0 + 0i
+
+  map = Hash.new('~')
+  oxygen = nil
+  dir = NORTH
+
+  loop do
+    droid.inputs << MOVE_CMDS[dir]
+    droid.execute(true)
+    output = droid.outputs.shift
+
+    if output == HIT_WALL
+      map[complex_to_coord(position + dir)] = WALL
+      dir *= -1i
+    else
+      map[complex_to_coord(position)] = CORRIDOR
+      position += dir
+      dir *= 1i
+      if output == OXYGEN
+        # when we have visited the oxygen twice, we have explored the whole maze,
+        # and should execute the callback to find the answer
+        return send(callback, map, oxygen, start) unless oxygen.nil?
+
+        oxygen = position.dup
+      end
+    end
+
+    map[complex_to_coord(position)] = DROID
+    map[complex_to_coord(oxygen)] = 'X' unless oxygen.nil?
+
+    puts "moved #{dir} output #{output} | position #{position}".ljust(80)
+    d = draw(map)
+    puts d
+    puts "\033[#{d.split("\n").length + 2}A\r"
+  end
+end
+
 def backtrack(map, oxygen, start)
-  puts "Backtracking to start...".ljust(80)
+  puts 'Backtracking to start...'.ljust(80)
   search_map = map.map { |k, v| [k[0] + 1i * k[1], v] }.to_h
   search = Set[oxygen]
   1.step do |depth|
     search.dup.each do |elem|
       MOVE_CMDS.keys.each do |dir|
-        search << elem + dir if search_map[elem + dir] == '.'
+        search << elem + dir if search_map[elem + dir] == CORRIDOR
       end
     end
 
@@ -68,53 +113,15 @@ def backtrack(map, oxygen, start)
   end
 end
 
-def part_one(program)
-  droid = Intcode.new(program)
-  start = 0 + 0i
-  position = 0 + 0i
-
-  map = Hash.new('~')
-  oxygen = nil
-  dir = NORTH
-
-  loop do
-    droid.inputs << MOVE_CMDS[dir]
-    droid.execute(true)
-    output = droid.outputs.shift
-
-    case output
-      when HIT_WALL
-        map[complex_to_coord(position + dir)] = '#'
-        dir *= -1i
-      when MOVED
-        map[complex_to_coord(position)] = '.'
-        position += dir
-        dir *= 1i
-      when OXYGEN
-        map[complex_to_coord(position)] = '.'
-        position += dir
-        return backtrack(map, oxygen, start) unless oxygen.nil?
-
-        oxygen = position.dup
-    end
-    map[complex_to_coord(position)] = 'D'
-    map[complex_to_coord(oxygen)] = 'X' unless oxygen.nil?
-
-    puts "moved #{dir} output #{output} | position #{position}".ljust(80)
-    d = draw(map)
-    puts d
-    puts "\033[#{d.split("\n").length + 2}A\r"
-  end
-end
-
-def fill(map, oxygen, start)
-  puts "Filling with oxygen...".ljust(80)
+def fill(map, oxygen, _start)
+  puts 'Filling with oxygen...'.ljust(80)
   search_map = map.map { |k, v| [k[0] + 1i * k[1], v] }.to_h
   search = Set[oxygen]
+  prev_filled = 0
   1.step do |depth|
     search.dup.each do |elem|
       MOVE_CMDS.keys.each do |dir|
-        search << elem + dir if search_map[elem + dir] == '.'
+        search << elem + dir if search_map[elem + dir] == CORRIDOR
       end
     end
 
@@ -124,49 +131,21 @@ def fill(map, oxygen, start)
 
     d = draw(map)
     puts d
-    return depth if map.values.count { |v| v == '.' } == 0
+
+    return depth - 1 if search.length == prev_filled # the previous step was the one where it became filled
+
+    prev_filled = search.length
 
     puts "\033[#{d.split("\n").length + 1}A\r"
   end
 end
 
+def part_one(program)
+  explore(program, :backtrack)
+end
+
 def part_two(program)
-  droid = Intcode.new(program)
-  start = 0 + 0i
-  position = 0 + 0i
-
-  map = Hash.new('~')
-  oxygen = nil
-  dir = NORTH
-
-  loop do
-    droid.inputs << MOVE_CMDS[dir]
-    droid.execute(true)
-    output = droid.outputs.shift
-
-    case output
-      when HIT_WALL
-        map[complex_to_coord(position + dir)] = '#'
-        dir *= -1i
-      when MOVED
-        map[complex_to_coord(position)] = '.'
-        position += dir
-        dir *= 1i
-      when OXYGEN
-        map[complex_to_coord(position)] = '.'
-        position += dir
-        return fill(map, oxygen, start) unless oxygen.nil?
-
-        oxygen = position.dup
-    end
-    map[complex_to_coord(position)] = 'D'
-    map[complex_to_coord(oxygen)] = 'X' unless oxygen.nil?
-
-    puts "moved #{dir} output #{output} | position #{position}".ljust(80)
-    d = draw(map)
-    puts d
-    puts "\033[#{d.split("\n").length + 2}A\r"
-  end
+  explore(program, :fill)
 end
 
 if $PROGRAM_NAME == __FILE__
