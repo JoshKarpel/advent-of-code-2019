@@ -104,12 +104,69 @@ def part_one(program)
     d = draw(map)
     puts d
     puts "\033[#{d.split("\n").length + 2}A\r"
+  end
+end
 
-    #sleep 0.01
+def fill(map, oxygen, start)
+  puts "Filling with oxygen...".ljust(80)
+  search_map = map.map { |k, v| [k[0] + 1i * k[1], v] }.to_h
+  search = Set[oxygen]
+  1.step do |depth|
+    search.dup.each do |elem|
+      MOVE_CMDS.keys.each do |dir|
+        search << elem + dir if search_map[elem + dir] == '.'
+      end
+    end
+
+    search.each do |coord|
+      map[complex_to_coord(coord)] = 'O'
+    end
+
+    d = draw(map)
+    puts d
+    return depth if map.values.count { |v| v == '.' } == 0
+
+    puts "\033[#{d.split("\n").length + 1}A\r"
   end
 end
 
 def part_two(program)
+  droid = Intcode.new(program)
+  start = 0 + 0i
+  position = 0 + 0i
+
+  map = Hash.new('~')
+  oxygen = nil
+  dir = NORTH
+
+  loop do
+    droid.inputs << MOVE_CMDS[dir]
+    droid.execute(true)
+    output = droid.outputs.shift
+
+    case output
+      when HIT_WALL
+        map[complex_to_coord(position + dir)] = '#'
+        dir *= -1i
+      when MOVED
+        map[complex_to_coord(position)] = '.'
+        position += dir
+        dir *= 1i
+      when OXYGEN
+        map[complex_to_coord(position)] = '.'
+        position += dir
+        return fill(map, oxygen, start) unless oxygen.nil?
+
+        oxygen = position.dup
+    end
+    map[complex_to_coord(position)] = 'D'
+    map[complex_to_coord(oxygen)] = 'X' unless oxygen.nil?
+
+    puts "moved #{dir} output #{output} | position #{position}".ljust(80)
+    d = draw(map)
+    puts d
+    puts "\033[#{d.split("\n").length + 2}A\r"
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
