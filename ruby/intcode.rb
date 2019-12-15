@@ -24,10 +24,13 @@ class Intcode
     @halted = false
   end
 
-  def execute(stop_on_output = false)
+  def execute(stop_on_output = false, stop_on_empty_input = false)
     loop do
       #puts state
       opcode, modes = opcode_and_modes
+
+      return self if stop_on_empty_input && opcode == 3 && @inputs.length.zero?
+
       op = operation opcode
       move = op.call(*parameters(op, modes))
 
