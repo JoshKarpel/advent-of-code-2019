@@ -16,9 +16,9 @@ def read_reactions
   reactions
 end
 
-def part_one(reactions)
+def needed_ore(reactions, amount_of_fuel)
   needed = Hash.new(0)
-  needed['FUEL'] = 1
+  needed['FUEL'] = amount_of_fuel
   spare = Hash.new(0)
 
   while needed.keys != ['ORE']
@@ -45,7 +45,15 @@ def part_one(reactions)
   needed['ORE']
 end
 
+def part_one(reactions)
+  needed_ore(reactions, 1)
+end
+
 def part_two(reactions)
+  # this finds the first result which is TOO LARGE, sub 1 to get desired answer
+  (1..1_000_000_000).bsearch do |fuel|
+    needed_ore(reactions, fuel) > 1000000000000
+  end - 1
 end
 
 if $PROGRAM_NAME == __FILE__
