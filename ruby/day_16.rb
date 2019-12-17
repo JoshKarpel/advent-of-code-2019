@@ -11,12 +11,12 @@ def read_signal(path)
 end
 
 def last_digit(number)
-  number.to_s[-1].to_i
+  number.abs % 10
 end
 
 def pattern(index)
   position = index + 1
-  (Array.new(position, 0) + Array.new(position, 1) + Array.new(position, 0) + Array.new(position, -1)).cycle
+  [0, 1, 0, -1].map { |v| Array.new(position, v) }.sum([]).cycle
 end
 
 def part_one(signal)
@@ -33,6 +33,18 @@ def part_one(signal)
 end
 
 def part_two(signal)
+  offset = signal[0, 7].join.to_i
+  # the offset is far past the midpoint, so we can just do the array from there onwards
+  signal = signal.cycle(10_000).to_a[offset..-1]
+  100.times do
+    sum = signal.sum
+    signal = signal.map do |s|
+      sum -= s
+      sum + s
+    end
+    signal = signal.map { |s| last_digit(s) }
+  end
+  signal.join[0, 8]
 end
 
 if $PROGRAM_NAME == __FILE__
