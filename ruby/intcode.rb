@@ -24,7 +24,7 @@ class Intcode
     @halted = false
   end
 
-  def execute(stop_on_output = false, stop_on_empty_input = false)
+  def execute!(stop_on_output = false, stop_on_empty_input = false)
     loop do
       #puts state
       opcode, modes = opcode_and_modes

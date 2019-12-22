@@ -10,7 +10,7 @@ def part_one(program)
   outputs = (0..4).to_a.permutation.map do |phases|
     input = 0
     phases.each do |phase|
-      input = Intcode.new(program, [phase, input]).execute.outputs.first
+      input = Intcode.new(program, [phase, input]).execute!.outputs.first
     end
     input # the last input goes to the thrusters
   end
@@ -23,7 +23,7 @@ def part_two(program)
     programs = phases.map { |phase| Intcode.new(program, [phase]) }
     programs.each.cycle do |prog|
       prog.inputs << input
-      input = prog.execute(stop_on_output: true).outputs.last
+      input = prog.execute!(stop_on_output: true).outputs.last
       break if (prog == programs.last) && prog.halted
     end
     input # the last input goes to the thrusters

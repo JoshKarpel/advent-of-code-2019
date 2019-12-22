@@ -29,10 +29,10 @@ def paint_hull(program, starting_color)
   loop do
     brain.inputs << hull[position]
 
-    brain.execute(stop_on_output: true)
+    brain.execute!(stop_on_output: true)
     break if brain.halted
 
-    brain.execute(stop_on_output: true)
+    brain.execute!(stop_on_output: true)
     color, turn = brain.outputs.shift(2)
 
     hull[position] = color

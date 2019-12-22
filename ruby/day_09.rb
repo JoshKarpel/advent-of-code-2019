@@ -7,11 +7,11 @@ require 'pathname'
 require_relative 'intcode'
 
 def part_one(program)
-  Intcode.new(program, [1]).execute.outputs.last
+  Intcode.new(program, [1]).execute!.outputs.last
 end
 
 def part_two(program)
-  Intcode.new(program, [2]).execute.outputs.last
+  Intcode.new(program, [2]).execute!.outputs.last
 end
 
 if $PROGRAM_NAME == __FILE__

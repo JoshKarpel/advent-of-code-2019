@@ -10,7 +10,7 @@ require_relative 'utils'
 
 def part_one(program)
   game = Intcode.new program
-  game.execute.outputs.each_slice(3).map(&:last).tally[2]
+  game.execute!.outputs.each_slice(3).map(&:last).tally[2]
 end
 
 CHARS = {
@@ -51,7 +51,7 @@ def part_two(program)
   screen = Screen.new(40, 25)
 
   1.step do |tick|
-    game.execute(false, true)
+    game.execute!(false, true)
 
     game.outputs.each_slice(3) do |x, y, tile|
       if x == -1

@@ -61,7 +61,7 @@ def explore(program, callback)
 
   loop do
     droid.inputs << MOVE_CMDS[dir]
-    droid.execute(true)
+    droid.execute!(true)
     output = droid.outputs.shift
 
     if output == HIT_WALL
