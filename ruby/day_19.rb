@@ -17,8 +17,30 @@ def part_one(program)
   end.count(true)
 end
 
-def part_two(program)
+def display(x, y, w, program)
+  lines = []
+  (y..y + w).step do |y|
+    line = []
+    (x..x + w).step do |x|
+      line << if in_beam?(x, y, program)
+        '#'
+      else
+        '.'
+      end
+    end
+    lines << line.join('')
+  end
+  puts lines.join("\n")
+end
 
+def part_two(program)
+  x = 0
+  w = 99 # advance by 99 to get 100 in a row
+  0.step do |y|
+    x += 1 until in_beam?(x, y, program)
+
+    return (x * 10_000) + (y - w) if in_beam?(x + w, y - w, program)
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
