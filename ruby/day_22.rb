@@ -10,34 +10,26 @@ def read_shuffles(path)
   path.readlines.map(&:chomp)
 end
 
-NUM_CARDS = 10_007
-
-def part_one(shuffles)
-  deck = (0...NUM_CARDS).to_a
-
+def track_position(shuffles, position, num_cards)
   shuffles.each do |shuffle|
     if shuffle =~ /deal into new stack/
-      deck.reverse!
+      position = num_cards - position - 1
     elsif !(match = /cut (-?\d+)/.match(shuffle)).nil?
-      deck.rotate!(count = match[1].to_i)
+      position -= match[1].to_i
     elsif !(match = /deal with increment (\d+)/.match(shuffle)).nil?
-      increment = match[1].to_i
-      new_deck = Array.new(NUM_CARDS)
-      target = 0
-      deck.each do |card|
-        new_deck[target] = card
-        target += increment
-        target %= NUM_CARDS
-      end
-      deck = new_deck
+      position *= match[1].to_i
     end
+    position %= num_cards
   end
 
-  deck.find_index { |card| card == 2019 }
+  position
+end
+
+def part_one(shuffles)
+  track_position(shuffles, 2019, 10_007)
 end
 
 def part_two(shuffles)
-
 end
 
 if $PROGRAM_NAME == __FILE__
